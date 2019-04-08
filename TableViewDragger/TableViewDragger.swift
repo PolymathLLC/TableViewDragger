@@ -38,12 +38,19 @@ open class TableViewDragger: NSObject {
 
     /// It will be `true` if want to hide the original cell.
     open var isHiddenOriginCell: Bool = true
+    
     /// Zoom scale of cell in drag.
     open var zoomScaleForCell: CGFloat = 1
+    
     /// Alpha of cell in drag.
     open var alphaForCell: CGFloat = 1
+    
     /// Opacity of cell shadow in drag.
     open var opacityForShadowOfCell: Float = 0.4
+    
+    /// Opacity of cell shadow in drag.
+    open var needClipsContent: Bool = true
+    
     /// Velocity of auto scroll in drag.
     open var scrollVelocity: CGFloat = 1
     open weak var delegate: TableViewDraggerDelegate?
@@ -159,10 +166,6 @@ open class TableViewDragger: NSObject {
         let cellRect = tableView.rectForRow(at: indexPath)
         copiedCell.frame.size = cellRect.size
 
-        if let height = tableView.delegate?.tableView?(tableView, heightForRowAt: indexPath) {
-            copiedCell.frame.size.height = height
-        }
-
         let cell = TableViewDraggerCell(cell: copiedCell)
         cell.dragScale = zoomScaleForCell
         cell.dragAlpha = alphaForCell
@@ -209,8 +212,11 @@ extension TableViewDragger {
             }
 
             actualCell?.isHidden = isHiddenOriginCell
-            targetClipsToBounds = tableView.clipsToBounds
-            tableView.clipsToBounds = false
+            
+            if needClipsContent {
+                targetClipsToBounds = tableView.clipsToBounds
+                tableView.clipsToBounds = false
+            }
         }
 
         delegate?.dragger?(self, didBeginDraggingAt: indexPath)
@@ -262,8 +268,10 @@ extension TableViewDragger {
                 cell.isHidden = false
             }
 
-            tableView.clipsToBounds = self.targetClipsToBounds
-
+            if self.needClipsContent {
+                tableView.clipsToBounds = self.targetClipsToBounds
+            }
+            
             self.draggingCell = nil
         }
     }
