@@ -53,6 +53,7 @@ open class TableViewDragger: NSObject {
     
     /// Velocity of auto scroll in drag.
     open var scrollVelocity: CGFloat = 1
+    
     open weak var delegate: TableViewDraggerDelegate?
     open weak var dataSource: TableViewDraggerDataSource?
     //
@@ -149,7 +150,8 @@ open class TableViewDragger: NSObject {
         if let cell = targetTableView?.cellForRow(at: indexPath) {
             if let view = cell.snapshotView(afterScreenUpdates: false) {
                 return view
-            } else if let view = cell.captured() {
+            }
+            else if let view = cell.captured() {
                 view.frame = cell.bounds
                 return view
             }
@@ -193,18 +195,15 @@ extension TableViewDragger {
             if let draggedCell = draggedCell(tableView, indexPath: dragIndexPath) {
                 let point = gesture.location(in: actualCell)
                 
-                if availableHorizontalScroll == true{
-                    
+                if availableHorizontalScroll == true {
                     draggedCell.offset = point
                     draggedCell.transformToPoint(point)
                     draggedCell.location = gesture.location(in: tableView)
-                    
-                } else {
-                    
+                }
+                else {
                     draggedCell.offset = CGPoint(x: (draggedCell.frame.size.width)/2, y: point.y)
                     draggedCell.transformToPoint(CGPoint(x: (draggedCell.frame.size.width)/2, y: point.y))
                     draggedCell.location = CGPoint(x: (draggedCell.frame.size.width)/2, y: gesture.location(in: tableView).y)
-                    
                 }
                 
                 tableView.addSubview(draggedCell)
@@ -228,23 +227,20 @@ extension TableViewDragger {
         }
         
         if availableHorizontalScroll == true{
-            
             draggingCell.location = gesture.location(in: tableView)
-            
-        } else {
-            
+        }
+        else {
             draggingCell.location = CGPoint(x: (draggingCell.frame.size.width)/2, y: gesture.location(in: tableView).y)
         }
-        
         
         if let adjustedDirection = tableView.draggingDirection(at: draggingCell.adjustedCenter(on: tableView)) {
             displayLink?.isPaused = false
             draggingDirection = adjustedDirection
-        } else {
+        }
+        else {
             draggingDirection = direction
         }
         
-
         dragCell(tableView, draggingCell: draggingCell)
     }
 
@@ -288,7 +284,8 @@ private extension TableViewDragger {
 
         if let direction = tableView.draggingDirection(at: center) {
             draggingDirection = direction
-        } else {
+        }
+        else {
             displayLink.isPaused = true
         }
 
@@ -296,11 +293,10 @@ private extension TableViewDragger {
 
         dragCell(tableView, draggingCell: draggingCell)
         
-        if availableHorizontalScroll == true{
-            
+        if availableHorizontalScroll == true {
             draggingCell.location = panGesture.location(in: tableView)
-        } else {
-            
+        }
+        else {
             draggingCell.location = CGPoint(x: draggingCell.frame.size.width/2, y: panGesture.location(in: tableView).y)
         }
         
@@ -315,9 +311,9 @@ private extension TableViewDragger {
             if let path = targetTableView?.indexPathForRow(at: point) {
                 draggingDidBegin(gesture, indexPath: path)
             }
+            
         case .ended, .cancelled:
             draggingDidEnd(gesture)
-
             targetTableView?.isScrollEnabled = true
 
         case .changed, .failed, .possible:
@@ -333,9 +329,11 @@ private extension TableViewDragger {
         let offsetY = gesture.translation(in: targetTableView).y
         if offsetY < 0 {
             draggingDidChange(gesture, direction: .up)
-        } else if offsetY > 0 {
+        }
+        else if offsetY > 0 {
             draggingDidChange(gesture, direction: .down)
-        } else {
+        }
+        else {
             draggingDidChange(gesture, direction: nil)
         }
 
@@ -353,7 +351,8 @@ extension TableViewDragger: UIGestureRecognizerDelegate {
                 if let ret = delegate?.dragger?(self, shouldDragAt: indexPath) {
                     return ret
                 }
-            } else {
+            }
+            else {
                 return false
             }
         }
